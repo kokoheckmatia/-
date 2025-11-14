@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2025年会礼品心愿漂流瓶</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- 配置Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#C41E3A', // 年会红色
+            secondary: '#D4AF37', // 金色
+            dark: '#1E293B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-b from-blue-50 to-blue-100 min-h-screen font-sans text-dark">
+  <!-- 导航栏 -->
+  <nav id="mainNav" class="fixed w-full z-50 transition-all duration-300 bg-white/80 backdrop-blur-md shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-gift text-primary text-2xl"></i>
+        <h1 class="text-xl font-bold text-primary">2025年会年会礼品心愿漂流瓶</h1>
+      </div>
+      
+      <div class="hidden md:flex items-center space-x-6">
+        <button id="navWrite" class="nav-btn text-primary hover:text-primary/80 transition-colors font-medium">
+          <i class="fa fa-pencil mr-1"></i> 写心愿
+        </button>
+        <button id="navVote" class="nav-btn text-primary hover:text-primary/80 transition-colors font-medium">
+          <i class="fa fa-thumbs-up mr-1"></i> 投票区
+        </button>
+        <button id="navAdmin" class="nav-btn text-primary hover:text-primary/80 transition-colors font-medium">
+          <i class="fa fa-lock mr-1"></i> 管理后台
+        </button>
+      </div>
+      
+      <!-- 移动端菜单按钮 -->
+      <button id="mobileMenuBtn" class="md:hidden text-primary text-xl">
+        <i class="fa fa-bars"></i>
+      </button>
+    </div>
+    
+    <!-- 移动端菜单 -->
+    <div id="mobileMenu" class="hidden md:hidden bg-white shadow-md absolute w-full">
+      <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+        <button id="mobileWrite" class="py-2 text-left text-primary hover:bg-primary/5 px-2 rounded transition-colors">
+          <i class="fa fa-pencil mr-2"></i> 写心愿
+        </button>
+        <button id="mobileVote" class="py-2 text-left text-primary hover:bg-primary/5 px-2 rounded transition-colors">
+          <i class="fa fa-thumbs-up mr-2"></i> 投票区
+        </button>
+        <button id="mobileAdmin" class="py-2 text-left text-primary hover:bg-primary/5 px-2 rounded transition-colors">
+          <i class="fa fa-lock mr-2"></i> 管理后台
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 英雄区域 -->
+  <section id="hero" class="pt-28 pb-16 md:pt-36 md:pb-24 px-4 relative overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden opacity-10">
+      <div class="absolute -top-10 -left-10 w-64 h-64 rounded-full bg-primary/30"></div>
+      <div class="absolute top-1/3 -right-20 w-80 h-80 rounded-full bg-secondary/30"></div>
+    </div>
+    
+    <div class="container mx-auto relative z-10">
+      <div class="text-center max-w-3xl mx-auto">
+        <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-primary mb-6 leading-tight text-shadow">
+          2025年会心愿漂流瓶
+        </h2>
+        <p class="text-[clamp(1rem,2vw,1.25rem)] text-gray-600 mb-8">
+          写下你心仪的年会礼品，为喜欢的礼品投票，让幸运降临！
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <button id="heroWriteBtn" class="px-8 py-3 bg-primary text-white rounded-full font-medium shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 transition-all duration-300">
+            <i class="fa fa-paper-plane mr-2"></i> 写下心愿
+          </button>
+          <button id="heroVoteBtn" class="px-8 py-3 bg-white text-primary border-2 border-primary rounded-full font-medium hover:bg-primary/5 hover:-translate-y-1 transition-all duration-300">
+            <i class="fa fa-eye mr-2"></i> 浏览心愿
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 写心愿区域 -->
+  <section id="writeSection" class="py-16 px-4 bg-white hidden">
+    <div class="container mx-auto max-w-2xl">
+      <div class="text-center mb-12">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-primary mb-4">写下你的心愿礼品</h2>
+        <p class="text-gray-600">可以添加多个心仪的礼品，每个礼品会单独展示供大家投票</p>
+      </div>
+      
+      <div class="bg-light rounded-2xl shadow-xl p-6 md:p-8">
+        <form id="wishForm" class="space-y-6">
+          <div>
+            <label for="name" class="block text-gray-700 font-medium mb-2">你的名字</label>
+            <input type="text" id="name" name="name" required
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                  placeholder="请输入你的名字">
+          </div>
+          
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">心愿礼品</label>
+            <div id="giftsContainer" class="space-y-4">
+              <div class="gift-input-group flex gap-2">
+                <input type="text" name="gifts[]" required
+                      class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                      placeholder="请输入你想要的礼品...">
+                <button type="button" class="remove-gift-btn text-gray-400 hover:text-red-500 self-center px-2 py-1 hidden">
+                  <i class="fa fa-times text-xl"></i>
+                </button>
+              </div>
+            </div>
+            
+            <button type="button" id="addGiftBtn" class="mt-3 text-primary hover:text-primary/80 font-medium transition-colors">
+              <i class="fa fa-plus-circle mr-1"></i> 添加另一个礼品
+            </button>
+          </div>
+          
+          <div class="pt-4">
+            <button type="submit" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-1 transition-all duration-300">
+              <i class="fa fa-bottle mr-2"></i> 封存心愿
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 投票区域 -->
+  <section id="voteSection" class="py-16 px-4 bg-gradient-to-b from-white to-blue-50 hidden">
+    <div class="container mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-primary mb-4">心愿礼品列表</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">浏览大家的心愿礼品，为你喜欢的礼品投票吧！</p>
+      </div>
+      
+      <div class="flex justify-center mb-8">
+        <div class="relative w-full max-w-3xl">
+          <input type="text" id="searchWishes" placeholder="搜索名字或礼品..."
+                 class="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+          <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </div>
+      
+      <div id="wishesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <!-- 心愿卡片将通过JS动态生成 -->
+      </div>
+      
+      <div id="noWishes" class="text-center py-16 hidden">
+        <i class="fa fa-inbox text-5xl text-gray-300 mb-4"></i>
+        <p class="text-gray-500">暂时还没有心愿哦，快来成为第一个写下心愿的人吧！</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 管理员区域 -->
+  <section id="adminSection" class="py-16 px-4 bg-white hidden">
+    <div class="container mx-auto max-w-6xl">
+      <div class="text-center mb-12">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-primary mb-4">管理后台</h2>
+        <p class="text-gray-600">查看所有心愿和投票结果</p>
+      </div>
+      
+      <!-- 管理员登录 -->
+      <div id="adminLogin" class="max-w-md mx-auto bg-light rounded-2xl shadow-xl p-8">
+        <h3 class="text-xl font-bold text-primary mb-6 text-center">请登录</h3>
+        <form id="loginForm" class="space-y-6">
+          <div>
+            <label for="adminUser" class="block text-gray-700 font-medium mb-2">用户名</label>
+            <input type="text" id="adminUser" name="adminUser" required
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+          </div>
+          
+          <div>
+            <label for="adminPass" class="block text-gray-700 font-medium mb-2">密码</label>
+            <input type="password" id="adminPass" name="adminPass" required
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+          </div>
+          
+          <div>
+            <button type="submit" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
+              <i class="fa fa-sign-in mr-2"></i> 登录
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- 管理员内容 -->
+      <div id="adminContent" class="hidden">
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- 统计图表 -->
+          <div class="lg:w-1/3 bg-light rounded-2xl shadow-lg p-6">
+            <h3 class="text-xl font-bold text-primary mb-6">投票统计</h3>
+            <div class="h-64">
+              <canvas id="votesChart"></canvas>
+            </div>
+            <div class="mt-6 space-y-4">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600">总礼品数：</span>
+                <span id="totalGifts" class="font-bold text-primary">0</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600">总投票数：</span>
+                <span id="totalVotes" class="font-bold text-primary">0</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600">参与人数：</span>
+                <span id="totalParticipants" class="font-bold text-primary">0</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 心愿列表 -->
+          <div class="lg:w-2/3 bg-light rounded-2xl shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-xl font-bold text-primary">所有心愿礼品</h3>
+              <button id="exportData" class="px-4 py-2 bg-secondary text-white rounded-lg font-medium hover:bg-secondary/80 transition-colors">
+                <i class="fa fa-download mr-1"></i> 导出数据
+              </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="min-w-full">
+                <thead>
+                  <tr class="bg-gray-100">
+                    <th class="py-3 px-4 text-left text-gray-600 font-medium">姓名</th>
+                    <th class="py-3 px-4 text-left text-gray-600 font-medium">心愿礼品</th>
+                    <th class="py-3 px-4 text-left text-gray-600 font-medium">投票数</th>
+                  </tr>
+                </thead>
+                <tbody id="adminWishesTable">
+                  <!-- 表格内容将通过JS动态生成 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 成功提交弹窗 -->
+  <div id="successModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 transform transition-all scale-100">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i class="fa fa-check text-2xl text-green-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">提交成功！</h3>
+        <p class="text-gray-600 mb-6">你的心愿已经封存到漂流瓶中啦~</p>
+        <button id="modalCloseBtn" class="px-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/80 transition-colors">
+          确定
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="bg-dark text-white py-8 px-4">
+    <div class="container mx-auto text-center">
+      <p>© 2025 年会筹备组 | 心愿漂流瓶活动</p>
+      <p class="text-gray-400 text-sm mt-2">祝大家新年快乐，心想事成！</p>
+    </div>
+  </footer>
+
+  <script>
+    // 全局数据存储
+    const appData = {
+      gifts: [], // 存储所有礼品心愿，每个礼品单独一项
+      users: [], // 存储用户信息，避免重复
+      currentUser: null,
+      isAdmin: false,
+      adminCredentials: {
+        username: 'admin',
+        password: 'admin123' // 实际应用中应使用加密存储和验证
+      }
+    };
+
+    // DOM元素
+    const elements = {
+      sections: {
+        hero: document.getElementById('hero'),
+        write: document.getElementById('writeSection'),
+        vote: document.getElementById('voteSection'),
+        admin: document.getElementById('adminSection')
+      },
+      nav: {
+        main: document.getElementById('mainNav'),
+        buttons: {
+          write: document.getElementById('navWrite'),
+          vote: document.getElementById('navVote'),
+          admin: document.getElementById('navAdmin'),
+          mobileWrite: document.getElementById('mobileWrite'),
+          mobileVote: document.getElementById('mobileVote'),
+          mobileAdmin: document.getElementById('mobileAdmin'),
+          heroWrite: document.getElementById('heroWriteBtn'),
+          heroVote: document.getElementById('heroVoteBtn')
+        },
+        mobileMenuBtn: document.getElementById('mobileMenuBtn'),
+        mobileMenu: document.getElementById('mobileMenu')
+      },
+      forms: {
+        wish: document.getElementById('wishForm'),
+        login: document.getElementById('loginForm')
+      },
+      containers: {
+        gifts: document.getElementById('giftsContainer'),
+        wishes: document.getElementById('wishesContainer'),
+        noWishes: document.getElementById('noWishes'),
+        adminContent: document.getElementById('adminContent'),
+        adminLogin: document.getElementById('adminLogin'),
+        adminWishesTable: document.getElementById('adminWishesTable')
+      },
+      buttons: {
+        addGift: document.getElementById('addGiftBtn'),
+        exportData: document.getElementById('exportData')
+      },
+      modals: {
+        success: document.getElementById('successModal'),
+        closeBtn: document.getElementById('modalCloseBtn')
+      },
+      search: document.getElementById('searchWishes'),
+      admin: {
+        totalGifts: document.getElementById('totalGifts'),
+        totalVotes: document.getElementById('totalVotes'),
+        totalParticipants: document.getElementById('totalParticipants')
+      },
+      chart: null
+    };
+
+    // 初始化应用
+    function initApp() {
+      // 从本地存储加载数据
+      loadData();
+      
+      // 绑定事件监听器
+      bindEvents();
+      
+      // 初始化礼品输入框
+      initGiftInputs();
+      
+      // 渲染礼品列表
+      renderGifts();
+      
+      // 初始化图表
+      initChart();
+    }
+
+    // 从本地存储加载数据
+    function loadData() {
+      const savedGifts = localStorage.getItem('2025年会心愿漂流瓶_礼品');
+      if (savedGifts) {
+        appData.gifts = JSON.parse(savedGifts);
+      }
+      
+      const savedUsers = localStorage.getItem('2025年会心愿漂流瓶_用户');
+      if (savedUsers) {
+        appData.users = JSON.parse(savedUsers);
+      }
+      
+      const currentUser = localStorage.getItem('2025年会心愿漂流瓶_当前用户');
+      if (currentUser) {
+        appData.currentUser = JSON.parse(currentUser);
+      }
+    }
+
+    // 保存数据到本地存储
+    function saveData() {
+      localStorage.setItem('2025年会心愿漂流瓶_礼品', JSON.stringify(appData.gifts));
+      localStorage.setItem('2025年会心愿漂流瓶_用户', JSON.stringify(appData.users));
+      if (appData.currentUser) {
+        localStorage.setItem('2025年会心愿漂流瓶_当前用户', JSON.stringify(appData.currentUser));
+      }
+    }
+
+    // 初始化礼品输入框
+    function initGiftInputs() {
+      // 确保至少有一个输入框
+      if (elements.containers.gifts.children.length === 0) {
+        addGiftInput();
+      } else {
+        // 为现有输入框添加删除按钮事件
+        updateRemoveButtons();
+      }
+    }
+
+    // 添加礼品输入框
+    function addGiftInput(value = '') {
+      const inputGroup = document.createElement('div');
+      inputGroup.className = 'gift-input-group flex gap-2';
+      inputGroup.innerHTML = `
+        <input type="text" name="gifts[]" required
+              class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+              placeholder="请输入你想要的礼品..." value="${value}">
+        <button type="button" class="remove-gift-btn text-gray-400 hover:text-red-500 self-center px-2 py-1">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      `;
+      
+      elements.containers.gifts.appendChild(inputGroup);
+      
+      // 更新删除按钮状态
+      updateRemoveButtons();
+      
+      // 为新添加的删除按钮绑定事件
+      const removeBtn = inputGroup.querySelector('.remove-gift-btn');
+      removeBtn.addEventListener('click', () => {
+        elements.containers.gifts.removeChild(inputGroup);
+        updateRemoveButtons();
+      });
+      
+      // 聚焦到新输入框
+      inputGroup.querySelector('input').focus();
+    }
+
+    // 更新删除按钮状态
+    function updateRemoveButtons() {
+      const inputGroups = elements.containers.gifts.querySelectorAll('.gift-input-group');
+      const removeBtns = elements.containers.gifts.querySelectorAll('.remove-gift-btn');
+      
+      // 如果只有一个输入框，隐藏删除按钮
+      if (inputGroups.length <= 1) {
+        removeBtns.forEach(btn => btn.classList.add('hidden'));
+      } else {
+        removeBtns.forEach(btn => btn.classList.remove('hidden'));
+      }
+    }
+
+    // 绑定所有事件监听器
+    function bindEvents() {
+      // 添加礼品按钮
+      elements.buttons.addGift.addEventListener('click', () => addGiftInput());
+      
+      // 导航按钮事件
+      elements.nav.buttons.write.addEventListener('click', () => showSection('write'));
+      elements.nav.buttons.vote.addEventListener('click', () => showSection('vote'));
+      elements.nav.buttons.admin.addEventListener('click', () => showSection('admin'));
+      elements.nav.buttons.mobileWrite.addEventListener('click', () => {
+        showSection('write');
+        elements.nav.mobileMenu.classList.add('hidden');
+      });
+      elements.nav.buttons.mobileVote.addEventListener('click', () => {
+        showSection('vote');
+        elements.nav.mobileMenu.classList.add('hidden');
+      });
+      elements.nav.buttons.mobileAdmin.addEventListener('click', () => {
+        showSection('admin');
+        elements.nav.mobileMenu.classList.add('hidden');
+      });
+      elements.nav.buttons.heroWrite.addEventListener('click', () => showSection('write'));
+      elements.nav.buttons.heroVote.addEventListener('click', () => showSection('vote'));
+      
+      // 移动端菜单切换
+      elements.nav.mobileMenuBtn.addEventListener('click', () => {
+        elements.nav.mobileMenu.classList.toggle('hidden');
+      });
+      
+      // 心愿表单提交
+      elements.forms.wish.addEventListener('submit', handleWishSubmit);
+      
+      // 管理员登录表单提交
+      elements.forms.login.addEventListener('submit', handleAdminLogin);
+      
+      // 成功弹窗关闭
+      elements.modals.closeBtn.addEventListener('click', () => {
+        elements.modals.success.classList.add('hidden');
+        showSection('vote');
+      });
+      
+      // 搜索功能
+      elements.search.addEventListener('input', handleSearch);
+      
+      // 导出数据
+      elements.buttons.exportData.addEventListener('click', exportData);
+      
+      // 滚动时导航栏效果
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+          elements.nav.main.classList.add('shadow-md');
+          elements.nav.main.classList.remove('bg-white/80');
+          elements.nav.main.classList.add('bg-white');
+        } else {
+          elements.nav.main.classList.remove('shadow-md');
+          elements.nav.main.classList.add('bg-white/80');
+          elements.nav.main.classList.remove('bg-white');
+        }
+      });
+    }
+
+    // 显示指定区域
+    function showSection(sectionName) {
+      // 隐藏所有区域
+      Object.values(elements.sections).forEach(section => {
+        section.classList.add('hidden');
+      });
+      
+      // 显示指定区域
+      elements.sections[sectionName].classList.remove('hidden');
+      
+      // 如果是管理员区域，检查是否已登录
+      if (sectionName === 'admin') {
+        if (appData.isAdmin) {
+          showAdminContent();
+        } else {
+          elements.containers.adminContent.classList.add('hidden');
+          elements.containers.adminLogin.classList.remove('hidden');
+        }
+      }
+      
+      // 滚动到顶部
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 处理心愿提交
+    function handleWishSubmit(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('name').value.trim();
+      const giftInputs = elements.containers.gifts.querySelectorAll('input[name="gifts[]"]');
+      
+      // 收集所有礼品
+      const gifts = Array.from(giftInputs)
+        .map(input => input.value.trim())
+        .filter(gift => gift); // 过滤空值
+      
+      if (gifts.length === 0) {
+        alert('请至少输入一个心愿礼品');
+        return;
+      }
+      
+      // 保存当前用户信息（用于防止重复投票）
+      appData.currentUser = { name };
+      
+      // 检查用户是否已存在，不存在则添加
+      if (!appData.users.some(user => user.name === name)) {
+        appData.users.push({ name });
+      }
+      
+      // 为每个礼品创建单独的心愿项
+      const userId = Date.now().toString(); // 用于关联同一用户的多个礼品
+      gifts.forEach(gift => {
+        appData.gifts.push({
+          id: `${userId}-${Date.now().toString().slice(-4)}`, // 生成唯一ID
+          userId,
+          name,
+          gift,
+          votes: 0,
+          voters: [],
+          createdAt: new Date().toISOString()
+        });
+      });
+      
+      // 保存数据
+      saveData();
+      
+      // 重置表单
+      elements.forms.wish.reset();
+      // 保留一个空输入框
+      elements.containers.gifts.innerHTML = '';
+      addGiftInput();
+      
+      // 显示成功弹窗
+      elements.modals.success.classList.remove('hidden');
+      
+      // 更新礼品列表
+      renderGifts();
+    }
+
+    // 处理投票
+    function handleVote(giftId) {
+      // 检查用户是否已提交心愿（未提交则提示先提交）
+      if (!appData.currentUser) {
+        if (confirm('请先提交你的心愿，才能为他人投票哦！')) {
+          showSection('write');
+        }
+        return;
+      }
+      
+      const giftIndex = appData.gifts.findIndex(gift => gift.id === giftId);
+      if (giftIndex === -1) return;
+      
+      // 检查是否已经投过票
+      if (appData.gifts[giftIndex].voters.includes(appData.currentUser.name)) {
+        alert('你已经为这个礼品投过票啦！');
+        return;
+      }
+      
+      // 增加票数并记录投票人
+      appData.gifts[giftIndex].votes++;
+      appData.gifts[giftIndex].voters.push(appData.currentUser.name);
+      
+      // 保存数据
+      saveData();
+      
+      // 更新礼品列表
+      renderGifts();
+    }
+
+    // 处理管理员登录
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('adminUser').value;
+      const password = document.getElementById('adminPass').value;
+      
+      if (username === appData.adminCredentials.username && 
+          password === appData.adminCredentials.password) {
+        appData.isAdmin = true;
+        showAdminContent();
+      } else {
+        alert('用户名或密码错误');
+      }
+    }
+
+    // 显示管理员内容
+    function showAdminContent() {
+      elements.containers.adminLogin.classList.add('hidden');
+      elements.containers.adminContent.classList.remove('hidden');
+      
+      // 更新统计数据
+      updateAdminStats();
+      
+      // 渲染管理员礼品表格
+      renderAdminGiftsTable();
+      
+      // 更新图表
+      updateChart();
+    }
+
+    // 更新管理员统计数据
+    function updateAdminStats() {
+      elements.admin.totalGifts.textContent = appData.gifts.length;
+      
+      const totalVotes = appData.gifts.reduce((sum, gift) => sum + gift.votes, 0);
+      elements.admin.totalVotes.textContent = totalVotes;
+      
+      // 参与人数 = 提交心愿的用户数
+      elements.admin.totalParticipants.textContent = appData.users.length;
+    }
+
+    // 处理搜索
+    function handleSearch() {
+      const searchTerm = elements.search.value.toLowerCase().trim();
+      renderGifts(searchTerm);
+    }
+
+    // 渲染礼品列表
+    function renderGifts(searchTerm = '') {
+      if (appData.gifts.length === 0) {
+        elements.containers.wishes.classList.add('hidden');
+        elements.containers.noWishes.classList.remove('hidden');
+        return;
+      }
+      
+      elements.containers.noWishes.classList.add('hidden');
+      elements.containers.wishes.classList.remove('hidden');
+      
+      // 过滤礼品
+      const filteredGifts = searchTerm 
+        ? appData.gifts.filter(gift => 
+            gift.name.toLowerCase().includes(searchTerm) || 
+            gift.gift.toLowerCase().includes(searchTerm)
+          )
+        : appData.gifts;
+      
+      // 清空容器
+      elements.containers.wishes.innerHTML = '';
+      
+      // 添加礼品卡片
+      filteredGifts.forEach(gift => {
+        const isVoted = appData.currentUser && gift.voters.includes(appData.currentUser.name);
+        
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300';
+        card.innerHTML = `
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="font-bold text-lg text-gray-800">${gift.name}</h3>
+              </div>
+              <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                ${gift.votes} 票
+              </span>
+            </div>
+            
+            <div class="mb-6">
+              <h4 class="font-medium text-gray-700 mb-1">心愿礼品：</h4>
+              <p class="text-gray-600">${gift.gift}</p>
+            </div>
+            
+            <button data-id="${gift.id}" class="vote-btn w-full py-2 rounded-lg font-medium transition-colors ${
+              isVoted 
+                ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+                : 'bg-primary text-white hover:bg-primary/90'
+            }">
+              ${isVoted ? '<i class="fa fa-check mr-1"></i> 已投票' : '<i class="fa fa-thumbs-up mr-1"></i> 投票支持'}
+            </button>
+          </div>
+        `;
+        
+        elements.containers.wishes.appendChild(card);
+      });
+      
+      // 为投票按钮添加事件
+      document.querySelectorAll('.vote-btn:not(.cursor-not-allowed)').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const giftId = btn.getAttribute('data-id');
+          handleVote(giftId);
+        });
+      });
+    }
+
+    // 渲染管理员礼品表格
+    function renderAdminGiftsTable() {
+      elements.containers.adminWishesTable.innerHTML = '';
+      
+      // 按投票数排序（降序）
+      const sortedGifts = [...appData.gifts].sort((a, b) => b.votes - a.votes);
+      
+      sortedGifts.forEach(gift => {
+        const row = document.createElement('tr');
+        row.className = 'border-b border-gray-200 hover:bg-gray-50 transition-colors';
+        row.innerHTML = `
+          <td class="py-3 px-4">${gift.name}</td>
+          <td class="py-3 px-4 max-w-xs truncate">${gift.gift}</td>
+          <td class="py-3 px-4">
+            <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-sm font-medium">
+              ${gift.votes}
+            </span>
+          </td>
+        `;
+        elements.containers.adminWishesTable.appendChild(row);
+      });
+    }
+
+    // 初始化图表
+    function initChart() {
+      const ctx = document.createElement('canvas');
+      document.getElementById('votesChart').replaceWith(ctx);
+      
+      elements.chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [],
+          datasets: [{
+            label: '投票数',
+            data: [],
+            backgroundColor: 'rgba(196, 30, 58, 0.7)',
+            borderColor: 'rgba(196, 30, 58, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                precision: 0
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+      
+      updateChart();
+    }
+
+    // 更新图表数据
+    function updateChart() {
+      if (!elements.chart) return;
+      
+      // 取投票数前5的礼品
+      const topGifts = [...appData.gifts]
+        .sort((a, b) => b.votes - a.votes)
+        .slice(0, 5);
+      
+      elements.chart.data.labels = topGifts.map(gift => `${gift.gift.substring(0, 15)}${gift.gift.length > 15 ? '...' : ''}`);
+      elements.chart.data.datasets[0].data = topGifts.map(gift => gift.votes);
+      elements.chart.update();
+    }
+
+    // 导出数据为CSV
+    function exportData() {
+      // 准备CSV内容
+      let csvContent = "姓名,心愿礼品,投票数,投票人\n";
+      
+      appData.gifts.forEach(gift => {
+        const name = gift.name.replace(/,/g, '，');
+        const giftText = gift.gift.replace(/,/g, '，');
+        const voters = gift.voters.join(';').replace(/,/g, '，');
+        
+        csvContent += `${name},${giftText},${gift.votes},${voters}\n`;
+      });
+      
+      // 创建下载链接
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `2025年会心愿漂流瓶数据_${new Date().toLocaleDateString()}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // 启动应用
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
